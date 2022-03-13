@@ -37,6 +37,7 @@ object NetworkService {
 
         install(Auth) {
             basic {
+                sendWithoutRequest {true }
                 credentials {
                     BasicAuthCredentials(username = "sam", password = "password")
                 }
@@ -45,7 +46,7 @@ object NetworkService {
     }
 
     suspend fun makeReq(): HttpStatusCode {
-        val res: HttpResponse = client.get("posts")
+        val res: HttpResponse = client.get("/posts")
         return res.status
     }
 

@@ -6,7 +6,6 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.features.auth.*
 import io.ktor.client.features.auth.providers.*
-import io.ktor.client.features.cache.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
@@ -51,13 +50,13 @@ object NetworkService {
     }
 
     suspend fun makeReq2(): List<Post> {
-        val res: List<Post> = client.get("")
+        val res: List<Post> = client.get()
         Log.i("Network", "getPosts: $res ")
         return res
     }
 
     suspend fun makeReq3() {
-        client.post<Post>() {
+        client.post<Post> {
             contentType(ContentType.Application.Json)
             body = Post(body = "body", id = 2, title = "title", userId = 23)
         }

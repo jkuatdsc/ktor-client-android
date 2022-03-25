@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.otienosamwel.ktor_client_android.ui.presentation.oauth.OAuth2Activity
 import com.otienosamwel.ktor_client_android.ui.theme.KtorclientandroidTheme
+import com.otienosamwel.ktor_client_android.util.SharedPrefUtil
 
 class MainActivity : ComponentActivity() {
 
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SharedPrefUtil.getContext(this)
         setContent {
             KtorclientandroidTheme {
                 Surface(
@@ -35,8 +37,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        val intent = Intent(this@MainActivity, OAuth2Activity::class.java)
+        startActivity(intent)
     }
-
 
     @Composable
     fun Content() {

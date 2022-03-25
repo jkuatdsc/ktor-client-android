@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
@@ -18,15 +18,13 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
 import com.otienosamwel.ktor_client_android.data.remote.clientId
 import com.otienosamwel.ktor_client_android.ui.theme.KtorclientandroidTheme
+import com.otienosamwel.ktor_client_android.util.SharedPrefUtil
 import kotlinx.coroutines.launch
 
 class OAuth2Activity : ComponentActivity() {
 
     private val viewModel: OAuth2ViewModel by viewModels()
     private lateinit var googleSignInClient: GoogleSignInClient
-    private var authCode: String? = null
-    private var uid: String? = null
-
 
     private val startAuth = registerForActivityResult(StartActivityForResult()) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
@@ -37,26 +35,25 @@ class OAuth2Activity : ComponentActivity() {
         try {
             val code = task.result.serverAuthCode!!
             val userId = task.result.id!!
-            authCode = code
-            uid = userId
+            SharedPrefUtil.run {
+                setAuthCode(code)
+                setUid(userId)
+            }
             viewModel.loginUser(true)
             Log.d(TAG, "auth code: $code")
 
         } catch (e: ApiException) {
-            Log.w(TAG, "auth code failed $e")
+            Log.e(TAG, "auth code failed ${e.printStackTrace()}")
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SharedPrefUtil.getContext(this)
         setContent {
             KtorclientandroidTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    OAuth(this::login)
-                }
+                Surface(modifier = Modifier.fillMaxSize(), color = colors.background)
+                { OAuth(this::login, this::getUserEmails) }
             }
         }
 
@@ -70,7 +67,7 @@ class OAuth2Activity : ComponentActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         viewModel.isLoggedIn.observe(this) {
-            getUserInfo()
+            getUserEmails()
         }
     }
 
@@ -79,13 +76,9 @@ class OAuth2Activity : ComponentActivity() {
         startAuth.launch(intent)
     }
 
-    private fun getUserInfo() {
+    private fun getUserEmails() {
         lifecycleScope.launch {
-            authCode?.let { code ->
-                uid?.let { id ->
-                    viewModel.getEmails(code, id)
-                }
-            }
+            viewModel.getEmails()
         }
     }
 

@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
 import com.otienosamwel.ktor_client_android.data.remote.clientId
+import com.otienosamwel.ktor_client_android.data.remote.clientSecretKey
 import com.otienosamwel.ktor_client_android.ui.theme.KtorclientandroidTheme
 import com.otienosamwel.ktor_client_android.util.SharedPrefUtil
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ class OAuth2Activity : ComponentActivity() {
 
     private val viewModel: OAuth2ViewModel by viewModels()
     private lateinit var googleSignInClient: GoogleSignInClient
+    private val preferences = SharedPrefUtil
 
     private val startAuth = registerForActivityResult(StartActivityForResult()) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
@@ -66,8 +68,12 @@ class OAuth2Activity : ComponentActivity() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
+        Log.i(TAG, "onCreate: clientId :$clientId, clientSecret: $clientSecretKey")
+
         viewModel.isLoggedIn.observe(this) {
-            getUserEmails()
+
+            //check if tokens are not there and make the first token request
+            if (preferences.getAccessToken() == null) viewModel.loadInitialTokenRequest()
         }
     }
 

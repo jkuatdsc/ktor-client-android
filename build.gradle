@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        compose_version = '1.2.0-alpha04'
-        ktor_version = "1.6.7"
+        compose_version = '1.2.0-alpha07'
+        ktor_version = "2.0.0"
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {

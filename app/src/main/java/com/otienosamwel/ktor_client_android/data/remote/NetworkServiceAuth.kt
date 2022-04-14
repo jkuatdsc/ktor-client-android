@@ -65,7 +65,8 @@ object NetworkServiceAuth {
                 RefreshTokenRequest(
                     grantType = "refresh_token",
                     clientId = clientId,
-                    refreshToken = preferences.getRefreshToken()!!
+                    refreshToken = preferences.getRefreshToken()!!,
+                    clientSecret = clientSecretKey
                 )
             )
             markAsRefreshTokenRequest()
